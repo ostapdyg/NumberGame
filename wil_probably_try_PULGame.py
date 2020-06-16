@@ -101,15 +101,6 @@ def main():
         def update(self):
             self.state_func()
             return None
-            if self.moving:
-                self.step()
-            elif self.casting:
-                self.spell()
-            elif self.dying:
-                self.fall()
-            else:
-                self.x, self.y = GetCoord(self.i, self.j)
-            return None
 
         def move(self, di, dj):
             if (self.busy or di < 0 or dj < 0 or
@@ -260,9 +251,8 @@ def main():
                         self.pressed = True
                         self.active_image = self.click_image
                         self.blit()
-            if ev.type == pygame.MOUSEBUTTONDOWN:
-                if self.is_pressed(ev.pos):
-                    return self.action
+            if ev.type == pygame.MOUSEBUTTONDOWN and self.is_pressed(ev.pos):
+                return self.action
             return 0
 
         def blit(self):
@@ -352,9 +342,11 @@ def main():
         run = True
         while run:
             for ev in pygame.event.get():
-                if (ev.type == pygame.MOUSEBUTTONDOWN) or \
-                   (ev.type == pygame.KEYDOWN) or \
-                   (ev.type == pygame.MOUSEMOTION):
+                if ev.type in [
+                    pygame.MOUSEBUTTONDOWN,
+                    pygame.KEYDOWN,
+                    pygame.MOUSEMOTION,
+                ]:
                     run = False
                 if ev.type == pygame.QUIT:
                     pygame.quit()
@@ -487,8 +479,7 @@ def main():
 
     '''---------------------------About menu-------------------------------'''
     def About():
-        about_text = []
-        about_text.append(pygame.image.load(mfolder + '/text1.png'))
+        about_text = [pygame.image.load(mfolder + '/text1.png')]
         about_text.append(pygame.image.load(mfolder + '/text2.png'))
         active_text = 0
         screen.blit(pygame.image.load(mfolder + '/About_menu.png'), (0, 0))
@@ -694,12 +685,11 @@ def main():
             screen.blit(font1.render(str(mins) + ':' +
                         ('00' if secs == 0 else str(secs)),
                                     True, (font_color)), (600, 30))
-            if not multiplayer:
-                if char1.score >= max_score:
-                    screen.blit(font.render('Victory!', True, (shadow_color)),
-                                (13, 51))
-                    screen.blit(font.render('Victory!', True, (font_color)),
-                                (12, 50))
+            if not multiplayer and char1.score >= max_score:
+                screen.blit(font.render('Victory!', True, (shadow_color)),
+                            (13, 51))
+                screen.blit(font.render('Victory!', True, (font_color)),
+                            (12, 50))
             if multiplayer:
                 screen.blit(font1.render(str(char2.lifes),
                                          True, (font_color)), (460, 40))
